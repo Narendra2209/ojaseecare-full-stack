@@ -6,7 +6,7 @@ import { Trash2, Edit2, Plus } from 'lucide-react';
 import './Admin.css';
 
 const Admin = () => {
-    const { products, offers, addProduct, updateProduct, deleteProduct, addOffer, deleteOffer } = useProducts();
+    const { products, offers, addProduct, updateProduct, deleteProduct, addOffer, deleteOffer, refreshData } = useProducts();
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [password, setPassword] = useState('');
     const [activeTab, setActiveTab] = useState('products');
@@ -228,9 +228,14 @@ const Admin = () => {
             <header className="admin-header">
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
                     <h1>Admin Dashboard</h1>
-                    <button onClick={handleLogout} className="btn btn-secondary" style={{ padding: '8px 16px', fontSize: '14px' }}>
-                        Logout
-                    </button>
+                    <div style={{ display: 'flex', gap: '10px' }}>
+                        <button onClick={refreshData} className="btn btn-primary" style={{ padding: '8px 16px', fontSize: '14px' }}>
+                            🔄 Refresh Data
+                        </button>
+                        <button onClick={handleLogout} className="btn btn-secondary" style={{ padding: '8px 16px', fontSize: '14px' }}>
+                            Logout
+                        </button>
+                    </div>
                 </div>
                 <div className="admin-tabs">
                     <button className={activeTab === 'products' ? 'active' : ''} onClick={() => setActiveTab('products')}>Products</button>

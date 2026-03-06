@@ -165,6 +165,11 @@ export const ProductProvider = ({ children }) => {
         return products.filter(p => p.category === category);
     };
 
+    const refreshData = () => {
+        // Force reload the page to get fresh data from initialData.js
+        window.location.reload();
+    };
+
     return (
         <ProductContext.Provider value={{
             products,
@@ -177,7 +182,8 @@ export const ProductProvider = ({ children }) => {
             deleteOffer,
             getActiveOffers,
             getAllOffers,
-            getFilteredProducts
+            getFilteredProducts,
+            refreshData
         }}>
             {children}
         </ProductContext.Provider>
