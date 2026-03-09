@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { useProducts } from '../context/ProductContext';
 import { useNavigate } from 'react-router-dom';
 import { Trash2, Edit2, Plus } from 'lucide-react';
+import { adminLogin } from '../services/api';
 import './Admin.css';
 
 const Admin = () => {
@@ -90,18 +91,18 @@ const Admin = () => {
 
     const [username, setUsername] = useState('');
 
-    const handleLogin = (e) => {
+    const handleLogin = async (e) => {
         e.preventDefault();
-        const today = new Date();
-        const day = String(today.getDate()).padStart(2, '0');
-        const month = String(today.getMonth() + 1).padStart(2, '0');
-        const year = today.getFullYear();
-        const dynamicPassword = `${day}${month}${year}`;
-
-        if (username.toLowerCase() === 'pavan' && password === dynamicPassword) {
-            setIsAuthenticated(true);
-        } else {
-            alert(`Invalid Credentials. Please use username 'pawan' and today's date  as password.`);
+        try {
+            const result = await adminLogin(username, password);
+            if (result.success) {
+                setIsAuthenticated(true);
+            } else {
+                alert(`Invalid Credentials. Please use username 'pavan' and today's date as password.`);
+            }
+        } catch (error) {
+            console.error('Login error:', error);
+            alert('Login failed. Please check if the backend server is running.');
         }
     };
 

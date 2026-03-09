@@ -1,14 +1,11 @@
 import { useProducts } from '../context/ProductContext';
-import { Share2, Plus, RefreshCw, Trash2, Copy, Download } from 'lucide-react';
+import { Share2, Plus, RefreshCw, Trash2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { useState } from 'react';
 import './AllProducts.css';
 
 const AllProducts = () => {
-    const { products, offers } = useProducts();
+    const { products, offers, refreshData } = useProducts();
     const navigate = useNavigate();
-    const [showCodeSync, setShowCodeSync] = useState(false);
-    const [codeCopied, setCodeCopied] = useState(false);
 
     const exportData = () => {
         const dataToExport = {
@@ -29,48 +26,8 @@ const AllProducts = () => {
         linkElement.click();
     };
 
-    // Generate initialData.js code
-    const generateInitialDataCode = () => {
-        const productsCode = JSON.stringify(products, null, 4);
-        const offersCode = JSON.stringify(offers, null, 4);
-
-        return `export const initialProducts = ${productsCode};\n\nexport const initialOffers = ${offersCode};`;
-    };
-
-    // Copy code to clipboard
-    const copyCodeToClipboard = () => {
-        const code = generateInitialDataCode();
-        navigator.clipboard.writeText(code).then(() => {
-            setCodeCopied(true);
-            setTimeout(() => setCodeCopied(false), 2000);
-        });
-    };
-
-    // Download initialData.js
-    const downloadInitialDataCode = () => {
-        const code = generateInitialDataCode();
-        const dataUri = 'data:text/javascript;charset=utf-8,' + encodeURIComponent(code);
-        const linkElement = document.createElement('a');
-        linkElement.setAttribute('href', dataUri);
-        linkElement.setAttribute('download', 'initialData.js');
-        linkElement.click();
-    };
-
-    const handleResetData = () => {
-        if (window.confirm('⚠️ This will reset all products to default data. Are you sure?')) {
-            const { initialProducts, initialOffers } = require('../data/initialData');
-            localStorage.setItem('products', JSON.stringify(initialProducts));
-            localStorage.setItem('offers', JSON.stringify(initialOffers));
-            window.location.reload();
-        }
-    };
-
-    const handleClearAllData = () => {
-        if (window.confirm('⚠️ This will DELETE ALL products and offers! Are you sure?')) {
-            localStorage.setItem('products', JSON.stringify([]));
-            localStorage.setItem('offers', JSON.stringify([]));
-            window.location.reload();
-        }
+    const handleRefresh = () => {
+        refreshData();
     };
 
     return (
@@ -108,49 +65,11 @@ const AllProducts = () => {
                 <button className="btn btn-secondary" onClick={exportData}>
                     <Share2 size={18} /> Export Data
                 </button>
-                <button className="btn btn-info" onClick={() => setShowCodeSync(!showCodeSync)}>
-                    <Copy size={18} /> {showCodeSync ? 'Hide' : 'Sync to Code'}
-                </button>
-                <button className="btn btn-warning" onClick={handleResetData}>
-                    <RefreshCw size={18} /> Reset to Default
-                </button>
-                <button className="btn btn-danger" onClick={handleClearAllData}>
-                    <Trash2 size={18} /> Clear All
+                <button className="btn btn-warning" onClick={handleRefresh}>
+                    <RefreshCw size={18} /> Refresh Data
                 </button>
             </div>
 
-            {/* Code Sync Section */}
-            {showCodeSync && (
-                <section className="inventory-section code-sync-section">
-                    <h2>🔄 Sync to initialData.js</h2>
-                    <p className="sync-description">
-                        Copy or download the code below and replace the contents of <code>src/data/initialData.js</code>. This keeps your code in sync with current products and offers.
-                    </p>
-
-                    <div className="code-actions">
-                        <button className="btn btn-primary" onClick={copyCodeToClipboard}>
-                            <Copy size={18} /> {codeCopied ? '✓ Copied!' : 'Copy to Clipboard'}
-                        </button>
-                        <button className="btn btn-secondary" onClick={downloadInitialDataCode}>
-                            <Download size={18} /> Download initialData.js
-                        </button>
-                    </div>
-
-                    <pre className="code-block">
-                        <code>{generateInitialDataCode()}</code>
-                    </pre>
-
-                    <div className="sync-instructions">
-                        <h3>📝 How to Sync:</h3>
-                        <ol>
-                            <li>Click "Copy to Clipboard" or "Download initialData.js"</li>
-                            <li>Open <code>src/data/initialData.js</code> in your code editor</li>
-                            <li>Replace the entire content with the code above</li>
-                            <li>Save the file - products will now be in sync!</li>
-                        </ol>
-                    </div>
-                </section>
-            )}
 
             {/* Products Section */}
             <section className="inventory-section">
@@ -272,13 +191,13 @@ const AllProducts = () => {
             </section>
 
             {/* Raw Data Export */}
-            <section className="inventory-section">
+            {/*<section className="inventory-section">
                 <h2>📊 Raw Data</h2>
                 <details className="raw-data">
                     <summary>View Raw JSON Data</summary>
                     <pre><code>{JSON.stringify({ products, offers }, null, 2)}</code></pre>
                 </details>
-            </section>
+            </section>*/}
         </div>
     );
 };
