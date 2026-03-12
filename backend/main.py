@@ -41,7 +41,7 @@ app.add_middleware(
         "https://www.ojaseecare.com",
         "https://ojaseecare.com",
     ],
-    allow_origin_regex=r"https://(.*\.vercel\.app|(.+\.)?ojaseecare\.com)",
+    allow_origin_regex=r"https://(.*\.vercel\.app|.*\.onrender\.com|(.+\.)?ojaseecare\.com)",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
