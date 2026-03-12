@@ -58,6 +58,12 @@
     border-color: var(--color-primary);
 }
 
+.thumbnail-active {
+    border-color: var(--color-primary) !important;
+    transform: scale(1.05);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
 /* Info Section */
 .product-info-detail {
     display: flex;

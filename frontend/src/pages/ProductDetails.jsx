@@ -4,22 +4,28 @@ import { useCart } from '../context/CartContext';
 import { ShoppingCart, Star, Truck, ShieldCheck } from 'lucide-react';
 import ProductCard from '../components/ui/ProductCard';
 import './ProductDetails.css';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 const ProductDetails = () => {
     const { id } = useParams();
     const { products, getActiveOffers } = useProducts();
     const { addToCart } = useCart();
+    const [selectedImage, setSelectedImage] = useState(null);
 
     const product = products.find(p => String(p.id) === id);
 
+    // Reset selected image when product changes
     useEffect(() => {
         window.scrollTo(0, 0);
+        setSelectedImage(null);
     }, [id]);
 
     if (!product) {
         return <div className="container" style={{ padding: '100px 0', textAlign: 'center' }}>Product not found</div>;
     }
+
+    // Determine the main display image
+    const mainDisplayImage = selectedImage || product.image || product.mainImage || (product.images && product.images[0]);
 
     // Suggested Products (Same category, excluding current)
     const suggestedProducts = products
@@ -53,13 +59,18 @@ const ProductDetails = () => {
                     {/* Image Section */}
                     <div className="product-gallery">
                         <div className="main-image-container">
-                            <img src={product.image || product.mainImage || (product.images && product.images[0])} alt={product.name} className="main-image" />
+                            <img src={mainDisplayImage} alt={product.name} className="main-image" />
                         </div>
-                        {/* If we had multiple images, thumbnails would go here */}
                         {product.images && product.images.length > 1 && (
                             <div className="thumbnail-list">
                                 {product.images.map((img, idx) => (
-                                    <img key={idx} src={img} alt="" className="thumbnail" />
+                                    <img
+                                        key={idx}
+                                        src={img}
+                                        alt={`${product.name} view ${idx + 1}`}
+                                        className={`thumbnail ${(selectedImage || mainDisplayImage) === img ? 'thumbnail-active' : ''}`}
+                                        onClick={() => setSelectedImage(img)}
+                                    />
                                 ))}
                             </div>
                         )}
