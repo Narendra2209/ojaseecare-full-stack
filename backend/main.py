@@ -40,6 +40,7 @@ app.add_middleware(
         "https://ojaseecare-full-stack-wadm.vercel.app",
         "https://www.ojaseecare.com",
         "https://ojaseecare.com",
+        "https://ojaseecare-backend.onrender.com"
     ],
     allow_origin_regex=r"https://(.*\.vercel\.app|.*\.onrender\.com|(.+\.)?ojaseecare\.com)",
     allow_credentials=True,
