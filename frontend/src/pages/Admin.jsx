@@ -6,6 +6,32 @@ import { Trash2, Edit2, Plus } from 'lucide-react';
 import { adminLogin } from '../services/api';
 import './Admin.css';
 
+// Compress image to reduce base64 size (prevents 413 errors on Vercel)
+const compressImage = (file, maxWidth = 800, quality = 0.6) => {
+    return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const img = new Image();
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                let width = img.width;
+                let height = img.height;
+                if (width > maxWidth) {
+                    height = (height * maxWidth) / width;
+                    width = maxWidth;
+                }
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, width, height);
+                resolve(canvas.toDataURL('image/jpeg', quality));
+            };
+            img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+    });
+};
+
 const Admin = () => {
     const { products, offers, addProduct, updateProduct, deleteProduct, addOffer, deleteOffer, refreshData } = useProducts();
     const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -284,18 +310,15 @@ const Admin = () => {
                                         type="file"
                                         accept="image/*"
                                         multiple
-                                        onChange={(e) => {
+                                        onChange={async (e) => {
                                             const files = Array.from(e.target.files);
-                                            files.forEach(file => {
-                                                const reader = new FileReader();
-                                                reader.onloadend = () => {
-                                                    setProductForm(prev => ({
-                                                        ...prev,
-                                                        images: [...(prev.images || []), reader.result]
-                                                    }));
-                                                };
-                                                reader.readAsDataURL(file);
-                                            });
+                                            for (const file of files) {
+                                                const compressed = await compressImage(file);
+                                                setProductForm(prev => ({
+                                                    ...prev,
+                                                    images: [...(prev.images || []), compressed]
+                                                }));
+                                            }
                                         }}
                                         style={{ display: 'none' }}
                                     />
@@ -353,9 +376,9 @@ const Admin = () => {
                                         onChange={(e) => {
                                             const file = e.target.files[0];
                                             if (file) {
-                                                // Check file size (e.g., limit to 50MB for browser performance)
-                                                if (file.size > 50 * 1024 * 1024) {
-                                                    alert("File size too large! Please upload a video smaller than 50MB.");
+                                                // Limit to 5MB to avoid Vercel 413 errors
+                                                if (file.size > 5 * 1024 * 1024) {
+                                                    alert("Video file too large! Please upload a video smaller than 5MB, or paste a YouTube/URL link instead.");
                                                     return;
                                                 }
                                                 const reader = new FileReader();
