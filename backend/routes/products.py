@@ -1,4 +1,5 @@
 import uuid
+from bson import ObjectId
 from fastapi import APIRouter, HTTPException
 from database import get_db
 from models import ProductCreate, ProductUpdate, ProductResponse
@@ -6,10 +7,20 @@ from models import ProductCreate, ProductUpdate, ProductResponse
 router = APIRouter(prefix="/api/products", tags=["products"])
 
 
+def _find_query(product_id: str) -> dict:
+    """Build a query that matches by custom 'id' OR MongoDB '_id'."""
+    try:
+        return {"$or": [{"id": product_id}, {"_id": ObjectId(product_id)}]}
+    except Exception:
+        return {"id": product_id}
+
+
 def product_helper(product: dict) -> dict:
     """Convert MongoDB document to response dict."""
+    # Use custom id if present, otherwise fall back to str(_id)
+    product_id = product.get("id") or str(product.get("_id", ""))
     return {
-        "id": product.get("id", ""),
+        "id": product_id,
         "name": product.get("name", ""),
         "category": product.get("category", "Men"),
         "price": product.get("price", 0),
@@ -37,7 +48,7 @@ async def get_products():
 @router.get("/{product_id}")
 async def get_product(product_id: str):
     db = get_db()
-    product = await db.products.find_one({"id": product_id})
+    product = await db.products.find_one(_find_query(product_id))
     if not product:
         raise HTTPException(status_code=404, detail="Product not found")
     return product_helper(product)
@@ -70,7 +81,7 @@ async def create_product(product: ProductCreate):
 @router.put("/{product_id}")
 async def update_product(product_id: str, product: ProductUpdate):
     db = get_db()
-    existing = await db.products.find_one({"id": product_id})
+    existing = await db.products.find_one(_find_query(product_id))
     if not existing:
         raise HTTPException(status_code=404, detail="Product not found")
 
@@ -89,7 +100,7 @@ async def update_product(product_id: str, product: ProductUpdate):
             update_data["image"] = combined[0]
 
     if update_data:
-        await db.products.update_one({"id": product_id}, {"$set": update_data})
+        await db.products.update_one({"_id": existing["_id"]}, {"$set": update_data})
 
     return {"success": True, "id": product_id}
 
@@ -97,7 +108,10 @@ async def update_product(product_id: str, product: ProductUpdate):
 @router.delete("/{product_id}")
 async def delete_product(product_id: str):
     db = get_db()
-    result = await db.products.delete_one({"id": product_id})
+    existing = await db.products.find_one(_find_query(product_id))
+    if not existing:
+        raise HTTPException(status_code=404, detail="Product not found")
+    result = await db.products.delete_one({"_id": existing["_id"]})
     if result.deleted_count == 0:
         raise HTTPException(status_code=404, detail="Product not found")
     return {"success": True}
