@@ -259,9 +259,8 @@ const Home = () => {
                             <div className="stars">★★★★★</div>
                             <p className="review-text">"I've used many products, but Ojasee's Hair Renewal Powder is unlike anything else. It feels so pure and effective."</p>
                             <div className="review-author">
-                                <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="Priya" />
                                 <div>
-                                    <span className="name">Priya Sharma</span>
+                                    <span className="name">Shruthi Gowda</span>
                                     <span className="verified">Verified Buyer</span>
                                 </div>
                             </div>
@@ -270,9 +269,8 @@ const Home = () => {
                             <div className="stars">★★★★★</div>
                             <p className="review-text">"The Beard Cleansing Bar has completely changed my grooming routine. The scent is masculine and subtle."</p>
                             <div className="review-author">
-                                <img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=200" style={{ objectPosition: 'top' }} alt="Rahul" />
                                 <div>
-                                    <span className="name">Rahul Khanna</span>
+                                    <span className="name">Vinay Hegde</span>
                                     <span className="verified">Verified Buyer</span>
                                 </div>
                             </div>
@@ -281,9 +279,8 @@ const Home = () => {
                             <div className="stars">★★★★☆</div>
                             <p className="review-text">"Packaging is luxurious, and the products deliver on their promise. A true premium ayurvedic brand."</p>
                             <div className="review-author">
-                                <img src="https://randomuser.me/api/portraits/women/68.jpg" alt="Anjali" />
                                 <div>
-                                    <span className="name">Anjali Menon</span>
+                                    <span className="name">Ananya Shetty</span>
                                     <span className="verified">Verified Buyer</span>
                                 </div>
                             </div>
